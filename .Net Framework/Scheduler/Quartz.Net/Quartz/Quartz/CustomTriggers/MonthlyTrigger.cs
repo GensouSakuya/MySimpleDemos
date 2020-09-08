@@ -92,7 +92,7 @@ namespace Quartz.CustomTriggers
                     newMonth = nextFirstDayOfMonth.Month;
                     newDate = nextFirstDayOfMonth.AddDays(_nth - 1);
 
-                    if (_finalFireTime.HasValue && next > _finalFireTime)
+                    if (_finalFireTime.HasValue && newDate > _finalFireTime)
                         return null;
                 }
 
