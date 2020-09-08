@@ -104,6 +104,7 @@
     <Compile Include="CustomTriggers\Validator.cs" />
     <Compile Include="CustomTriggers\MonthlyTrigger.cs" />
     <Compile Include="CustomTriggers\WeeklyTrigger.cs" />
+    <Compile Include="CustomTriggers\MonthlyTriggerBuilder.cs" />
     <Compile Include="CustomTriggers\WeeklyTriggerBuilder.cs" />
     <Compile Include="Daily.cs" />
     <Compile Include="Monthly.cs" />

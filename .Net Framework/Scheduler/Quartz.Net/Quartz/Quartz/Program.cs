@@ -1,9 +1,6 @@
-﻿using Quartz.Impl;
-using Quartz.Impl.Calendar;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Quartz
@@ -12,47 +9,8 @@ namespace Quartz
     {
         static async Task Main(string[] args)
         {
-            //await Monthly.Interval(2, 29);
-            await Weekly.Interval(2,null);
-        }
-
-        private static async Task PerMonthDay()
-        {
-            const string key = "123";
-            var scheduler = await StdSchedulerFactory.GetDefaultScheduler();
-            Console.WriteLine(TimeZoneInfo.Local);
-            var trigger = TriggerBuilder.Create().WithIdentity(key)
-                .WithSchedule(MonthlyOnDayAndHourAndMinuteAndSec(31,1,1,1).InTimeZone(TimeZoneInfo.Local)).StartAt(new DateTimeOffset(DateTime.Now.AddMonths(2)))
-                .Build();
-            var job = JobBuilder.Create<TestJob>().Build();
-            await scheduler.ScheduleJob(job, trigger);
-            await scheduler.Start();
-            Console.WriteLine((await scheduler.GetTrigger(new TriggerKey(key))).GetNextFireTimeUtc().Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
-            await Task.Delay(3000);
-            Console.WriteLine((await scheduler.GetTrigger(new TriggerKey(key))).GetNextFireTimeUtc().Value.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
-        }
-
-
-
-        public static CronScheduleBuilder MonthlyOnDayAndHourAndMinuteAndSec(
-            int dayOfMonth,
-            int hour,
-            int minute,
-            int sec)
-        {
-            DateBuilder.ValidateDayOfMonth(dayOfMonth);
-            DateBuilder.ValidateHour(hour);
-            DateBuilder.ValidateMinute(minute);
-            var presumedValidCronExpression =
-                string.Format("{0} {1} {2} {3} * ?",sec, (object) minute, (object) hour, (object) dayOfMonth);
-            try
-            {
-                return CronScheduleBuilder.CronSchedule(new CronExpression(presumedValidCronExpression));
-            }
-            catch (FormatException ex)
-            {
-                throw new Exception("CronExpression '" + presumedValidCronExpression + "' is invalid, which should not be possible, please report bug to Quartz developers.", (Exception)ex);
-            }
+            //await Monthly.Interval(1, 10);
+            await Monthly.Interval(1, 5, DayOfWeek.Monday);
         }
     }
 
@@ -91,11 +49,11 @@ namespace Quartz
             {
                 Console.WriteLine($"start:{context.NextFireTimeUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")}");
             }
-            catch(Exception e)
+            catch
             {
-                var trigger = TriggerBuilder.Create().WithIdentity("retry").StartAt(DateTime.UtcNow.AddMinutes(5)).Build();
-                await context.Scheduler.ScheduleJob(context.JobDetail, trigger);
-                //build a new trigger
+                var trigger = TriggerBuilder.Create().ForJob(context.JobDetail.Key).WithIdentity("retry").StartAt(DateTime.UtcNow.AddMinutes(5))
+                    .Build();
+                await context.Scheduler.ScheduleJob(trigger);
             }
         }
     }

@@ -9,7 +9,7 @@ namespace Quartz
     class Weekly
     {
         /// <summary>
-        /// 每隔n天
+        /// 每隔n周的星期x
         /// </summary>
         /// <param name="n"></param>
         /// <param name="dayOfWeeks"></param>

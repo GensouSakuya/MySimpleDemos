@@ -30,7 +30,22 @@ namespace Quartz.CustomTriggers
 
         public override DateTimeOffset? GetNextFireTimeUtc()
         {
-            var next = _manualNextTime ?? _calculatedNextTime;
+            DateTimeOffset? next;
+            if (_manualNextTime.HasValue)
+            {
+                if (!_calculatedNextTime.HasValue)
+                {
+                    next = _manualNextTime;
+                }
+                else
+                {
+                    next = _calculatedNextTime < _manualNextTime ? _calculatedNextTime : _manualNextTime;
+                }
+            }
+            else
+            {
+                next = _calculatedNextTime;
+            }
             return next?.ToUniversalTime();
         }
 
@@ -45,6 +60,7 @@ namespace Quartz.CustomTriggers
         {
             Init();
             InitNextTime();
+            InitEndTime();
             return CalculatedNextTimeUtc;
         }
 
@@ -61,17 +77,33 @@ namespace Quartz.CustomTriggers
             _calculatedNextTime = GetNext(_calculatedNextTime.Value);
         }
 
+        private void InitEndTime()
+        {
+            if (EndTimeLocal.HasValue)
+            {
+                DateTimeOffset? startTime = StartTimeLocal;
+                DateTimeOffset? finalTime = null;
+                while (startTime.HasValue && startTime < EndTimeLocal)
+                {
+                    finalTime = startTime;
+                    startTime = GetNext(startTime.Value);
+                }
+
+                _finalFireTime = finalTime;
+            }
+        }
+
         private void InitNextTime()
         {
             var now = GetLocalTime(DateTime.UtcNow);
             _calculatedNextTime = StartTimeLocal;
 
-            //如果相差时间小于1秒，当作立刻执行
-            if (Math.Abs((StartTimeLocal - now).TotalSeconds) < 1)
-            {
-                //do nothing
-            }
-            else
+            ////如果相差时间小于1秒，当作立刻执行
+            //if (Math.Abs((StartTimeLocal - now).TotalSeconds) < 1)
+            //{
+            //    //do nothing
+            //}
+            //else
             {
                 //计算现在之后的下一次执行时间
                 while (_calculatedNextTime < now)

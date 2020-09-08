@@ -15,5 +15,15 @@ namespace Quartz.CustomTriggers
             if (interval < 0)
                 throw new ArgumentException("Invalid interval (must be >= 1).");
         }
+        public static void ValidateNthDayOfWeek(int nth)
+        {
+            if (nth < 0 || nth > 5)
+                throw new ArgumentException("Invalid nthDayOfWeek (must be >= 0 and <= 5).");
+        }
+        public static void ValidateNthDay(int nth)
+        {
+            if (nth < 0 || nth > 31)
+                throw new ArgumentException("Invalid nthDayOfWeek (must be >= 0 and <= 31).");
+        }
     }
 }

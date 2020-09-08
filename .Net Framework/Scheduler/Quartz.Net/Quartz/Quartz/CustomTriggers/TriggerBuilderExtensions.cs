@@ -10,5 +10,11 @@ namespace Quartz.CustomTriggers
             action(wb);
             return builder.WithSchedule(wb);
         }
+        public static TriggerBuilder WithMonthlyTrigger(this TriggerBuilder builder, Action<MonthlyTriggerBuilder> action)
+        {
+            var wb = new MonthlyTriggerBuilder();
+            action(wb);
+            return builder.WithSchedule(wb);
+        }
     }
 }

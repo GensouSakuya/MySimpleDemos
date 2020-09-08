@@ -34,24 +34,14 @@ namespace Quartz.CustomTriggers
             //如果没设置重复星期x的话，就取执行时间的星期来重复执行
             else
                 _repeatOnDayOfWeeks.Find(p => p.DayOfWeek == StartTimeLocal.DayOfWeek).IsIncluded = true;
-
-            if (EndTimeLocal.HasValue)
-            {
-                DateTimeOffset? startTime = StartTimeLocal;
-                DateTimeOffset? finalTime = null;
-                while (startTime.HasValue && startTime < EndTimeLocal)
-                {
-                    finalTime = startTime;
-                    startTime = GetNext(startTime.Value);
-                }
-
-                _finalFireTime = finalTime;
-            }
         }
 
         protected override DateTimeOffset? GetNext(DateTimeOffset dateTimeOffset)
         {
             if (!_repeatOnDayOfWeeks.Any())
+                return null;
+
+            if (_finalFireTime.HasValue && dateTimeOffset > _finalFireTime)
                 return null;
 
             DateTimeOffset? nextDate;
